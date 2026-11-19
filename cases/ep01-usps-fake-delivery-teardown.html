@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spot the 1-Day-Old Fake USPS Text (CASE #01) | BaitCheck</title>
+    <meta name="description" content="One of these holiday package texts is a live scam site caught today. Can you spot the trap in three seconds?" />
+    <link rel="canonical" href="https://pratham1997.github.io/baitcheck-web/cases/ep01-usps-fake-delivery-teardown.html" />
+    <link rel="stylesheet" href="../styles.css" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Spot the 1-Day-Old Fake USPS Text — How It Works & How to Stop It","description":"One of these holiday package texts is a live scam site caught today. Can you spot the trap in three seconds?","author":{"@type":"Organization","name":"BaitCheck"},"publisher":{"@type":"Organization","name":"BaitCheck"},"mainEntityOfPage":"https://pratham1997.github.io/baitcheck-web/cases/ep01-usps-fake-delivery-teardown.html"}</script>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="container nav-inner">
+        <a href="../index.html" class="brand">
+          <span class="rec-dot"></span>
+          <span>BAITCHECK</span>
+        </a>
+        <nav class="nav-links">
+          <a href="../index.html#newsletter">Weekly Brief</a>
+          <a href="../index.html#inspector">URL Inspector</a>
+          <a href="../index.html#checklist">60s Checklist</a>
+          <a href="../index.html#cases">All Case Files</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding-top: 42px; padding-bottom: 48px;">
+      <a href="../index.html#cases" style="color: #38bdf8; text-decoration: none; font-weight: 700; font-size: 14px;">
+        ← Back to all BaitCheck Case Files
+      </a>
+
+      <div style="margin-top: 20px;">
+        <div class="pill">CASE #01 • CONSUMER SCAMS</div>
+        <h1 style="font-size: clamp(28px, 4vw, 44px); font-weight: 900; line-height: 1.12; margin-bottom: 14px;">
+          Spot the 1-Day-Old Fake USPS Text
+        </h1>
+        <p style="color: #94a3b8; font-size: 18px; max-width: 760px;">
+          One of these holiday package texts is a live scam site caught today. Can you spot the trap in three seconds?
+        </p>
+        <p style="color:#64748b;font-size:13px;margin-top:10px;">Artifact / Source: OpenPhish Active Threat Feed (2026-11-19) &amp; Live RDAP Lookup (2026-11-19): uspsofficialdelivery[.]com registered 2026-11-18 via NameSilo, LLC. Official USPS domain usps.com has been active since 1995.</p>
+      </div>
+
+      <section class="section">
+        <div class="section-kicker">VERIFIED ARTIFACT TEARDOWN</div>
+        <h2 style="margin-bottom: 14px;">Live Active Phishing Domain Record</h2>
+        <div class="panel">
+          <div style="color:#ff7c92;font-family:ui-monospace,monospace;font-weight:800;font-size:18px;margin-bottom:14px;">
+            uspsofficialdelivery[.]com <span style="color:#64748b;font-size:13px;font-weight:600;">(OpenPhish + RDAP • 2026-11-19)</span>
+          </div>
+          <div class="domain-grid">
+            <div class="domain-box"><small>Registered Date</small><code>2026-11-18</code></div><div class="domain-box"><small>Domain Age</small><code>1 day old</code></div><div class="domain-box"><small>Official usps.com</small><code>Online since 1995</code></div><div class="domain-box"><small>Registrar</small><code>NameSilo, LLC</code></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">SPOTTING THE TRAP</div>
+        <h2 style="margin-bottom: 16px;">Key Red Flags Exposed</h2>
+        <div class="cards-grid">
+          <div class="panel" style="border-color: rgba(255,59,92,0.5);">
+            <div style="color:#ff7c92; font-weight:900; font-size:13px; letter-spacing:0.09em;">RED FLAG • LOOKALIKE ROOT DOMAIN</div>
+            <p style="color:#f1f5f9; margin-top:8px; font-size:15px;">Adding the word 'official' inside a .com domain does not make it USPS—real USPS tracking lives strictly on usps.com.</p>
+          </div><div class="panel" style="border-color: rgba(255,59,92,0.5);">
+            <div style="color:#ff7c92; font-weight:900; font-size:13px; letter-spacing:0.09em;">RED FLAG • 1-DAY-OLD PHISHING TRAP</div>
+            <p style="color:#f1f5f9; margin-top:8px; font-size:15px;">Live holiday-delivery phishing domain flagged on OpenPhish (Nov 19, 2026)—built to harvest card numbers under a fake $3 redelivery fee.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">ATTACK ANATOMY</div>
+        <h2 style="margin-bottom: 16px;">HOW THE $3 DELIVERY TRAP WORKS</h2>
+        <div class="cards-grid">
+          <div class="panel">
+            <div style="color:#38bdf8; font-weight:900; font-size:22px; margin-bottom:6px;">01 • Holiday Smishing Blast</div>
+            <p style="color:#cbd5e1; font-size:15px;">Randomly texted to millions expecting real Black Friday packages</p>
+          </div><div class="panel">
+            <div style="color:#38bdf8; font-weight:900; font-size:22px; margin-bottom:6px;">02 • Tiny $3 Redelivery Fee</div>
+            <p style="color:#cbd5e1; font-size:15px;">Low dollar amount lowers your guard so you enter card details</p>
+          </div><div class="panel">
+            <div style="color:#38bdf8; font-weight:900; font-size:22px; margin-bottom:6px;">03 • Live Card &amp; OTP Theft</div>
+            <p style="color:#cbd5e1; font-size:15px;">Stolen details are used immediately for unauthorized charges</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="panel" style="border-color: rgba(16,185,129,0.5); background: rgba(10, 26, 22, 0.85);">
+          <div class="section-kicker" style="color:#6ee7b7;">DEFENSE PROTOCOL</div>
+          <h2 style="margin-bottom: 16px;">3-SECOND DELIVERY CHECK</h2>
+          <ul class="flags-list">
+            <li>✅ Never tap payment links inside unexpected package texts</li><li>✅ Forward spam SMS to 7726 (SPAM) to report carriers</li><li>✅ Type usps.com manually or open the official carrier app</li>
+          </ul>
+          <div style="margin-top: 22px; display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="../index.html#newsletter" class="btn btn-primary">Get Weekly Family Scam Alerts (Free) →</a>
+            <a href="../index.html#inspector" class="btn btn-secondary">Inspect a Suspicious URL</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer container">
+      <p>BaitCheck — Independent consumer scam-awareness &amp; artifact teardowns. Educational information only.</p>
+    </footer>
+  </body>
+</html>
