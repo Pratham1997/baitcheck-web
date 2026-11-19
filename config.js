@@ -9,14 +9,13 @@
 window.BAITCHECK_CONFIG = {
   brandName: 'BaitCheck',
   tagline: 'Real Scam Artifact Teardowns, Private URL Checks & Free Family Defenses',
+  // Set real claimed channel URLs once created; leave empty to omit unverified links
   social: {
-    youtube: 'https://youtube.com/@BaitCheck',
-    instagram: 'https://instagram.com/baitcheck',
+    youtube: '',
+    instagram: '',
   },
-  // Paste your Beehiiv / ConvertKit / Formspree POST endpoint for the primary email funnel
+  // Paste your Beehiiv / ConvertKit / Formspree POST endpoint to enable the live signup form
   newsletterEndpoint: '',
-  // Optional: form/webhook URL where viewers can submit redacted scam texts/URLs for teardown
-  submissionUrl: '#newsletter',
   affiliatesEnabled: false,
   resources: [
     {
@@ -24,7 +23,7 @@ window.BAITCHECK_CONFIG = {
       badge: 'STOPS PHISHING AUTO-FILL',
       name: 'Domain-Locked Password Manager (Bitwarden / 1Password)',
       summary:
-        'A password manager refuses to auto-fill credentials on lookalike phishing domains (such as ezpass-ny-toll[.]com), stopping credential theft even when a clone page looks identical.',
+        'A password manager refuses to auto-fill credentials on lookalike phishing domains (such as uspsofficialdelivery[.]com), stopping credential theft even when a clone page looks identical.',
       ctaLabel: 'Explore Bitwarden (Free)',
       url: 'https://bitwarden.com/',
       accent: 'emerald',

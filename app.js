@@ -5,17 +5,46 @@
   const brandEl = document.getElementById('brand-name');
   if (brandEl && cfg.brandName) brandEl.textContent = cfg.brandName.toUpperCase();
 
-  // 1. Client-side Phishing URL Inspector
+  // 1. Client-side Phishing URL Inspector (with Official-Domain Allowlist + Bait-Word Detection)
   const SHORTENERS = new Set([
-    'bit.ly', 'tinyurl.com', 't.co', 'rb.gy', 'cutt.ly', 'is.gd', 'ow.ly', 'shorturl.at', 'tiny.cc',
+    'bit.ly', 'tinyurl.com', 't.co', 'rb.gy', 'cutt.ly', 'is.gd', 'ow.ly', 'shorturl.at', 'tiny.cc', 'rebrand.ly',
   ]);
   const RISKY_TLDS = new Set([
-    'xyz', 'top', 'click', 'loan', 'gq', 'tk', 'ml', 'cf', 'work', 'buzz', 'vip', 'shop', 'icu',
+    'xyz', 'top', 'click', 'loan', 'gq', 'tk', 'ml', 'cf', 'work', 'buzz', 'vip', 'shop', 'icu', 'info', 'cfd', 'sbs',
   ]);
-  const BRAND_TOKENS = [
-    'paypal', 'apple', 'icloud', 'google', 'amazon', 'microsoft', 'netflix', 'chase',
-    'bankofamerica', 'wellsfargo', 'usps', 'fedex', 'dhl', 'ezpass', 'sunpass', 'fastrak',
-    'coinbase', 'sbi', 'hdfc', 'icici', 'axis', 'paytm', 'gov', 'irs', 'rbi',
+  const BRAND_OFFICIAL_DOMAINS = {
+    usps: ['usps.com'],
+    fedex: ['fedex.com'],
+    dhl: ['dhl.com'],
+    ups: ['ups.com'],
+    paypal: ['paypal.com'],
+    apple: ['apple.com', 'icloud.com'],
+    icloud: ['icloud.com', 'apple.com'],
+    google: ['google.com', 'gmail.com', 'youtube.com'],
+    amazon: ['amazon.com', 'amazon.in', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.com.au', 'amzn.to'],
+    microsoft: ['microsoft.com', 'live.com', 'outlook.com', 'office.com'],
+    netflix: ['netflix.com'],
+    chase: ['chase.com'],
+    bankofamerica: ['bankofamerica.com'],
+    wellsfargo: ['wellsfargo.com'],
+    coinbase: ['coinbase.com'],
+    ezpass: [
+      'ezpassny.com', 'e-zpassny.com', 'ezpassnj.com', 'ezpasspa.com', 'ezpassva.com',
+      'ezpassma.com', 'ezpassmd.com', 'ezpassde.com', 'ezpassil.com', 'ezpassnh.com',
+      'ezpassoh.com', 'ezpasswv.com', 'ezpassin.com', 'ezpassri.com', 'ezpassme.com', 'e-zpassiag.com',
+    ],
+    sunpass: ['sunpass.com'],
+    fastrak: ['bayareafastrak.org', 'thetollroads.com', 'metroexpresslanes.net'],
+    irs: ['irs.gov'],
+    sbi: ['sbi.co.in', 'onlinesbi.sbi'],
+    hdfc: ['hdfcbank.com'],
+    icici: ['icicibank.com'],
+    paytm: ['paytm.com'],
+  };
+  const BAIT_DOMAIN_WORDS = [
+    'official', 'delivery', 'redelivery', 'parcel', 'tracking', 'track', 'verify', 'secure',
+    'support', 'billing', 'refund', 'toll', 'unpaid', 'alert', 'signin', 'login', 'account',
+    'update', 'claim', 'hold', 'fee', 'confirm', 'pay', 'invoice', 'helpdesk',
   ];
   const TWO_PART_TLDS = new Set([
     'co.uk', 'org.uk', 'gov.uk', 'co.in', 'gov.in', 'nic.in', 'ac.in', 'com.au', 'co.jp', 'com.sg',
@@ -31,68 +60,127 @@
     return last2;
   }
 
+  function getRootLabel(rootDomain) {
+    const parts = rootDomain.split('.');
+    if (parts.length >= 3 && TWO_PART_TLDS.has(parts.slice(-2).join('.'))) {
+      return parts.slice(0, -2).join('.');
+    }
+    return parts.slice(0, -1).join('.');
+  }
+
+  function matchesBrandInLabel(label, brand) {
+    if (!label.includes(brand)) return false;
+    // Avoid false positives for short <=3-char brands inside normal words (e.g. "ups" in "groups", "irs" in "first")
+    if (brand.length <= 3) {
+      const boundaryRe = new RegExp(`(^|[-_0-9])${brand}($|[-_0-9])`);
+      if (boundaryRe.test(label)) return true;
+      // Also match short brand prefix glued directly to a known scam bait word (e.g. "upsdelivery", "irspay")
+      return BAIT_DOMAIN_WORDS.some((w) => label.includes(`${brand}${w}`) || label.includes(`${w}${brand}`));
+    }
+    return true;
+  }
+
   function analyzeUrl(raw) {
-    const trimmed = raw.trim().replace(/\[\.\]/g, '.');
+    const trimmed = raw.trim().replace(/\[\.\]/g, '.').replace(/^hxxps?:\/\//i, (m) => m.replace(/^hxxp/i, 'http'));
     if (!trimmed) return null;
-    const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const hasExplicitScheme = /^https?:\/\//i.test(trimmed);
+    const normalized = hasExplicitScheme ? trimmed : `https://${trimmed}`;
     let parsed;
     try {
       parsed = new URL(normalized);
     } catch {
       return { error: 'That does not look like a valid URL. Include a domain like example.com.' };
     }
+    if (!parsed.hostname || !parsed.hostname.includes('.')) {
+      return { error: 'Please enter a full domain name (for example: uspsofficialdelivery[.]com).' };
+    }
 
     const host = parsed.hostname.toLowerCase();
     const rootDomain = getRootDomain(host);
+    const rootLabel = getRootLabel(rootDomain);
     const subdomain = host === rootDomain ? '(none)' : host.slice(0, -(rootDomain.length + 1));
     const tld = host.split('.').pop() || '';
     const flags = [];
     let score = 0;
 
-    if (parsed.protocol !== 'https:') {
+    if (hasExplicitScheme && parsed.protocol !== 'https:') {
       score += 25;
       flags.push('Unencrypted HTTP link — legitimate payment and login pages use HTTPS.');
     }
     if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) {
-      score += 45;
+      score += 50;
       flags.push('Raw IP address instead of a registered domain — strong phishing indicator.');
     }
     if (host.includes('xn--')) {
-      score += 45;
+      score += 50;
       flags.push('Punycode / internationalized lookalike characters detected (homograph attack risk).');
     }
     if (SHORTENERS.has(rootDomain)) {
-      score += 30;
-      flags.push(`URL shortener (${rootDomain}) hides the true destination — never enter credentials after clicking.`);
+      score += 35;
+      flags.push(`URL shortener (${rootDomain}) hides the true destination — never enter credentials or card info after clicking.`);
     }
     if (RISKY_TLDS.has(tld)) {
       score += 25;
       flags.push(`High-abuse top-level domain (.${tld}) frequently used in disposable scam campaigns.`);
     }
     if (raw.includes('@')) {
-      score += 40;
+      score += 45;
       flags.push('Contains "@" symbol — attackers use this to disguise the real host after the @.');
     }
-    if ((rootDomain.match(/-/g) || []).length >= 1 && /\d/.test(rootDomain)) {
+    if ((rootLabel.match(/-/g) || []).length >= 2) {
+      score += 25;
+      flags.push(`Multi-hyphen root domain ("${rootDomain}") — heavily used in disposable phishing clones.`);
+    } else if ((rootLabel.match(/-/g) || []).length >= 1 && /\d/.test(rootLabel)) {
       score += 25;
       flags.push(`Root domain "${rootDomain}" mixes hyphens and digits — common in throwaway scam clones.`);
     }
 
-    for (const brand of BRAND_TOKENS) {
-      if (subdomain !== '(none)' && subdomain.includes(brand) && !rootDomain.startsWith(`${brand}.`)) {
-        score += 45;
+    // Brand impersonation check (works WITH OR WITHOUT hyphens, e.g. uspsofficialdelivery.com!)
+    let brandImpersonated = null;
+    for (const [brand, officialList] of Object.entries(BRAND_OFFICIAL_DOMAINS)) {
+      const isOfficial = officialList.includes(rootDomain);
+      if (isOfficial) continue;
+
+      if (subdomain !== '(none)' && matchesBrandInLabel(subdomain, brand)) {
+        score += 55;
+        brandImpersonated = brand;
         flags.push(
-          `Subdomain spoofing: mentions "${brand}" on the left, but the TRUE site owner is "${rootDomain}".`,
+          `Subdomain spoofing: mentions "${brand.toUpperCase()}" on the left, but the TRUE site owner is "${rootDomain}" (official: ${officialList[0]}).`,
         );
         break;
       }
-      if (rootDomain.includes(brand) && rootDomain.includes('-')) {
-        score += 45;
+
+      if (matchesBrandInLabel(rootLabel, brand)) {
+        score += 55;
+        brandImpersonated = brand;
         flags.push(
-          `Hyphenated brand lookalike: "${rootDomain}" mimics "${brand}" instead of using the official domain.`,
+          `Brand lookalike root domain: "${rootDomain}" embeds "${brand.toUpperCase()}" inside an unofficial domain. Official domain is ${officialList[0]}.`,
         );
         break;
       }
+    }
+
+    // Check suspicious bait words glued inside the root domain (e.g., "official" + "delivery", "pay" + "zone")
+    const isAnyOfficial = Object.values(BRAND_OFFICIAL_DOMAINS).some((list) => list.includes(rootDomain));
+    if (!isAnyOfficial) {
+      const hitDomainBait = BAIT_DOMAIN_WORDS.filter((w) => rootLabel.includes(w));
+      if (hitDomainBait.length >= 2) {
+        score += 30;
+        flags.push(
+          `High-pressure bait keywords glued into the domain name (${hitDomainBait.slice(0, 4).join(', ')}) — classic smishing clone pattern.`,
+        );
+      } else if (hitDomainBait.length === 1 && (brandImpersonated || rootLabel.includes('-'))) {
+        score += 20;
+        flags.push(
+          `Suspicious action keyword ("${hitDomainBait[0]}") combined with a lookalike or hyphenated domain.`,
+        );
+      }
+    }
+
+    // Check subdomain depth / gov spoof tokens
+    if (subdomain !== '(none)' && /\bgov\b|-gov|gov-/.test(subdomain) && !tld.endsWith('gov')) {
+      score += 45;
+      flags.push(`Government impersonation cue ("gov") in subdomain on a non-.gov domain ("${rootDomain}").`);
     }
 
     const suspiciousPathWords = ['verify', 'kyc', 'urgent', 'suspend', 'refund', 'claim', 'unlock', 'pay-now', 'login'];
@@ -111,8 +199,19 @@
       );
     }
 
-    return { host, rootDomain, subdomain, protocol: parsed.protocol, score, level, flags };
+    return {
+      host,
+      rootDomain,
+      subdomain,
+      protocol: hasExplicitScheme ? parsed.protocol : '(not specified)',
+      score,
+      level,
+      flags,
+    };
   }
+
+  // Expose pure analyzer for automated CLI verification if needed
+  window.BAITCHECK_ANALYZE_URL = analyzeUrl;
 
   function escapeHtml(str) {
     return String(str)
@@ -128,7 +227,7 @@
 
   function renderUrlReport(raw) {
     const res = analyzeUrl(raw);
-    if (!res) return;
+    if (!res || !urlResult) return;
     urlResult.classList.add('visible');
     if (res.error) {
       urlResult.innerHTML = `<div style="color:#ff7c92;font-weight:700;">${escapeHtml(res.error)}</div>`;
@@ -152,7 +251,7 @@
       <div class="domain-grid">
         <div class="domain-box">
           <small>True Root Domain</small>
-          <code style="color:${res.level === 'high' ? '#ff7c92' : '#6ee7b7'};font-weight:800;">${escapeHtml(res.rootDomain)}</code>
+          <code style="color:${res.level === 'high' ? '#ff7c92' : res.level === 'medium' ? '#fcd34d' : '#6ee7b7'};font-weight:800;">${escapeHtml(res.rootDomain)}</code>
         </div>
         <div class="domain-box">
           <small>Subdomain (Can Be Faked)</small>
@@ -182,6 +281,16 @@
       renderUrlReport(urlInput.value);
     });
   });
+
+  // Auto-run inspection if deep-linked via ?url=... (e.g. from a Case File page)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const prefillUrl = params.get('url');
+    if (prefillUrl && urlInput) {
+      urlInput.value = prefillUrl;
+      renderUrlReport(prefillUrl);
+    }
+  } catch {}
 
   // 2. Consumer-Focused 60-Second Lockdown Checklist
   const CHECKLIST_DATA = [
@@ -219,7 +328,7 @@
       id: 'sms-links',
       cat: 'mobile',
       title: 'Never tap payment links in unexpected toll, parcel, or bank texts',
-      desc: 'Always open the official toll, courier, or bank app directly to verify any balance.',
+      desc: 'Forward spam SMS to 7726 (SPAM) and open the official toll, courier, or bank app directly.',
     },
     {
       id: 'qr-check',
@@ -312,6 +421,49 @@
 
   renderChecklist();
 
+  // Shared 1-Tap Family Share helper (Web Share API -> Clipboard / WhatsApp fallback)
+  async function shareBaitCheck(title, text, url, feedbackEl) {
+    const shareUrl = url || window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url: shareUrl });
+        if (feedbackEl) feedbackEl.textContent = 'Shared! Thanks for protecting your family.';
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${shareUrl}`);
+      if (feedbackEl) feedbackEl.textContent = 'Link copied! Paste straight into your family WhatsApp or text group.';
+    } catch {
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${shareUrl}`)}`, '_blank', 'noopener');
+    }
+  }
+
+  const shareHubBtn = document.getElementById('share-hub-btn');
+  const shareHubMsg = document.getElementById('share-hub-msg');
+  if (shareHubBtn) {
+    shareHubBtn.addEventListener('click', () => {
+      shareBaitCheck(
+        'BaitCheck — Free Family Scam Checklist & Private URL Inspector',
+        'Useful free tool to check suspicious package/bank links privately + 60-second Family Scam Checklist:',
+        window.location.href.split('#')[0].split('?')[0],
+        shareHubMsg,
+      );
+    });
+  }
+
+  const shareChecklistBtn = document.getElementById('share-checklist');
+  if (shareChecklistBtn) {
+    shareChecklistBtn.addEventListener('click', () => {
+      const base = window.location.href.split('#')[0].split('?')[0];
+      shareBaitCheck(
+        '60-Second Family Scam Lockdown Checklist — BaitCheck',
+        'Quick 60-second phone & family scam checklist worth saving:',
+        `${base}#checklist`,
+      );
+    });
+  }
+
   // 3. Render Honest Independent Resources (only shows affiliate disclosure if affiliatesEnabled === true)
   const disclosureEl = document.getElementById('disclosure-banner');
   if (disclosureEl && cfg.affiliatesEnabled) {
@@ -344,7 +496,7 @@
       .join('');
   }
 
-  // 4. Render Auto-Synced Published Case Files Archive (hide section until Ep 01 is published)
+  // 4. Render Auto-Synced Published Case Files Archive
   const casesSection = document.getElementById('cases');
   const casesEl = document.getElementById('case-files-grid');
   if (casesEl) {
@@ -367,7 +519,7 @@
           <p style="font-size:14px;color:#94a3b8;">${escapeHtml(ep.summary)}</p>
           <ul class="case-bullets">${bullets}</ul>
           <a href="${escapeHtml(ep.caseUrl || '#')}" style="margin-top:auto;padding-top:8px;color:#38bdf8;font-weight:700;font-size:13px;text-decoration:none;">
-            Read full forensic guide →
+            Read full forensic guide &amp; take 3s quiz →
           </a>
         </article>
       `;
@@ -375,25 +527,26 @@
       .join('');
   }
 
-  // 5. Primary Email Capture Form
+  // 5. Primary Email Capture Form (cleanly switches to instant-kit mode if newsletterEndpoint is not yet connected)
+  const nlLiveWrap = document.getElementById('newsletter-live-wrap');
+  const nlInstantWrap = document.getElementById('newsletter-instant-wrap');
+  const heroSecActions = document.getElementById('hero-secondary-actions');
   const nlForm = document.getElementById('newsletter-form');
   const nlEmail = document.getElementById('newsletter-email');
   const nlMsg = document.getElementById('newsletter-msg');
 
-  if (nlForm) {
+  if (!cfg.newsletterEndpoint) {
+    if (nlLiveWrap) nlLiveWrap.style.display = 'none';
+    if (nlInstantWrap) nlInstantWrap.style.display = 'block';
+    if (heroSecActions) heroSecActions.style.display = 'none';
+  } else if (nlForm) {
     nlForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = (nlEmail.value || '').trim();
       if (!email) return;
 
-      if (!cfg.newsletterEndpoint) {
-        nlMsg.textContent =
-          'Email capture ready (set newsletterEndpoint in web/config.js to connect Beehiiv/ConvertKit/Formspree).';
-        nlEmail.value = '';
-        return;
-      }
-
       try {
+        nlMsg.style.color = '#6ee7b7';
         nlMsg.textContent = 'Subscribing...';
         const res = await fetch(cfg.newsletterEndpoint, {
           method: 'POST',

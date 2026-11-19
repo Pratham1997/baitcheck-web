@@ -8,6 +8,24 @@
       name="description"
       content="Real consumer scam teardowns, 60-second printable Family Scam-Proofing Checklist, and a 100% private client-side Phishing URL Inspector from BaitCheck."
     />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="canonical" href="https://pratham1997.github.io/baitcheck-web/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BaitCheck" />
+    <meta property="og:title" content="BaitCheck — Free Family Scam Checklist &amp; Private URL Inspector" />
+    <meta
+      property="og:description"
+      content="Inspect suspicious texts &amp; links privately in your browser, print the 60-second Family Scam Lockdown Checklist, and read real scam artifact teardowns."
+    />
+    <meta property="og:url" content="https://pratham1997.github.io/baitcheck-web/" />
+    <meta property="og:image" content="https://pratham1997.github.io/baitcheck-web/og-card.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BaitCheck — Free Family Scam Checklist &amp; Private URL Inspector" />
+    <meta
+      name="twitter:description"
+      content="Inspect suspicious texts &amp; links privately in your browser, print the 60-second Family Scam Lockdown Checklist, and read real scam artifact teardowns."
+    />
+    <meta name="twitter:image" content="https://pratham1997.github.io/baitcheck-web/og-card.png" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -17,8 +35,7 @@
           <span class="rec-dot"></span>
           <span id="brand-name">BAITCHECK</span>
         </a>
-        <nav class="nav-links">
-          <a href="#newsletter">Weekly Brief</a>
+        <nav class="nav-links" aria-label="Primary">
           <a href="#inspector">URL Inspector</a>
           <a href="#checklist">60s Checklist</a>
           <a href="#cases">Case Files</a>
@@ -28,36 +45,77 @@
     </header>
 
     <main class="container">
-      <!-- Primary Funnel Above the Fold: Email Capture + Immediate Free Checklist -->
+      <!-- Primary Hero Above the Fold -->
       <section class="hero">
-        <div class="pill">REAL SCAM ARTIFACTS • ZERO TRACKING</div>
-        <h1>
-          Get the Free <span>Family Scam-Proofing</span> Brief &amp; Checklist
-        </h1>
-        <p id="brand-tagline">
-          One plain-English breakdown of a real active scam every week—written so you can
-          forward it straight to your parents or family group chat. Plus instant access to our private URL Inspector below.
-        </p>
-
-        <div id="newsletter" class="panel" style="max-width: 680px; margin: 0 auto 24px; text-align: left;">
-          <div class="section-kicker" style="color: #6ee7b7; margin-bottom: 8px;">
-            FREE WEEKLY SCAM BRIEF + PRINTABLE FAMILY CHECKLIST
-          </div>
-          <form id="newsletter-form" class="newsletter-form" style="max-width: 100%;">
-            <input type="email" id="newsletter-email" required placeholder="Enter your email for weekly scam alerts..." />
-            <button type="submit" class="btn btn-primary">Send Me the Free Kit</button>
-            <label style="width: 100%; display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #94a3b8; margin-top: 6px; cursor: pointer;">
-              <input type="checkbox" id="newsletter-consent" required style="margin-top: 2px; accent-color: #10b981;" />
-              <span>I consent to receive 1 weekly BaitCheck scam-alert email. Unsubscribe in 1 click anytime. See our <a href="./privacy.html" style="color: #38bdf8;">Privacy Policy</a>.</span>
-            </label>
-            <div id="newsletter-msg" class="newsletter-msg"></div>
-          </form>
-          <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
-            1 email/week. Zero spam. Unsubscribe in 1 click. Or jump straight into the free tools below without signing up.
-          </p>
+        <div class="hero-emblem" aria-hidden="true">
+          <svg viewBox="0 0 120 120" width="76" height="76">
+            <defs>
+              <linearGradient id="heroFoxFur" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FB923C" />
+                <stop offset="100%" stop-color="#C2410C" />
+              </linearGradient>
+            </defs>
+            <circle cx="60" cy="60" r="56" fill="#0B1222" stroke="#38BDF8" stroke-width="3" />
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#10B981" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
+            <polygon points="34,48 29,22 50,37" fill="url(#heroFoxFur)" stroke="#060911" stroke-width="3" stroke-linejoin="round" />
+            <polygon points="86,48 91,22 70,37" fill="url(#heroFoxFur)" stroke="#060911" stroke-width="3" stroke-linejoin="round" />
+            <ellipse cx="60" cy="61" rx="28" ry="24" fill="url(#heroFoxFur)" stroke="#060911" stroke-width="3" />
+            <path d="M 34 65 Q 48 61 60 67 Q 72 61 86 65 C 82 81 72 86 60 86 C 48 86 38 81 34 65 Z" fill="#F8FAFC" />
+            <rect x="38" y="51" width="18" height="12" rx="4" fill="rgba(56,189,248,0.22)" stroke="#38BDF8" stroke-width="2.5" />
+            <rect x="64" y="51" width="18" height="12" rx="4" fill="rgba(56,189,248,0.22)" stroke="#38BDF8" stroke-width="2.5" />
+            <line x1="56" y1="57" x2="64" y2="57" stroke="#38BDF8" stroke-width="2.5" />
+            <circle cx="47" cy="57" r="3" fill="#0EA5E9" />
+            <circle cx="73" cy="57" r="3" fill="#0EA5E9" />
+            <polygon points="56,70 64,70 60,75" fill="#060911" />
+          </svg>
         </div>
 
-        <div class="hero-actions">
+        <div class="pill">REAL SCAM ARTIFACTS • 100% PRIVATE TOOLS</div>
+        <h1>
+          Spot Fake Texts Before Your <span>Family Clicks</span>
+        </h1>
+        <p id="brand-tagline">
+          Real active phishing teardowns, an instant 100% private Phishing URL Inspector, and a
+          printable 60-Second Family Scam-Proofing Checklist—built to forward straight to your family group chat.
+        </p>
+
+        <!-- Primary Newsletter Card (auto-switches cleanly between live endpoint & instant-kit mode) -->
+        <div id="newsletter" class="panel" style="max-width: 680px; margin: 0 auto 24px; text-align: left;">
+          <div id="newsletter-live-wrap">
+            <div class="section-kicker" style="color: #6ee7b7; margin-bottom: 8px;">
+              FREE WEEKLY SCAM BRIEF + PRINTABLE FAMILY CHECKLIST
+            </div>
+            <form id="newsletter-form" class="newsletter-form" style="max-width: 100%;">
+              <input type="email" id="newsletter-email" required placeholder="Enter your email for weekly scam alerts..." />
+              <button type="submit" class="btn btn-primary">Send Me the Free Kit</button>
+              <label style="width: 100%; display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #94a3b8; margin-top: 6px; cursor: pointer;">
+                <input type="checkbox" id="newsletter-consent" required style="margin-top: 2px; accent-color: #10b981;" />
+                <span>I consent to receive 1 weekly BaitCheck scam-alert email. Unsubscribe in 1 click anytime. See our <a href="./privacy.html" style="color: #38bdf8;">Privacy Policy</a>.</span>
+              </label>
+              <div id="newsletter-msg" class="newsletter-msg"></div>
+            </form>
+            <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
+              1 email/week. Zero spam. Unsubscribe in 1 click. Or use the free tools below without signing up.
+            </p>
+          </div>
+
+          <div id="newsletter-instant-wrap" style="display: none;">
+            <div class="section-kicker" style="color: #6ee7b7; margin-bottom: 6px;">
+              INSTANT FREE FAMILY PROTECTION KIT • NO SIGNUP REQUIRED
+            </div>
+            <p style="font-size: 15px; color: #e2e8f0; margin: 0 0 16px; max-width: 100%;">
+              Test suspicious package, toll, or bank links privately in your browser—or print our 60-second Family Lockdown Checklist right now. Our weekly email brief opens soon.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="#inspector" class="btn btn-primary">Inspect a Suspicious URL →</a>
+              <a href="#checklist" class="btn btn-secondary">Open 60s Family Checklist</a>
+              <button type="button" id="share-hub-btn" class="btn btn-secondary">Share With Family</button>
+            </div>
+            <div id="share-hub-msg" class="newsletter-msg"></div>
+          </div>
+        </div>
+
+        <div class="hero-actions" id="hero-secondary-actions">
           <a href="#inspector" class="btn btn-secondary">Inspect a Suspicious URL Privately</a>
           <a href="#checklist" class="btn btn-secondary">Open Printable 60s Checklist</a>
         </div>
@@ -80,7 +138,7 @@
               id="url-input"
               class="url-input"
               type="text"
-              placeholder="Paste suspicious link (e.g. https://ezpass-ny-toll.example/pay-now)"
+              placeholder="Paste suspicious link (e.g. uspsofficialdelivery[.]com or https://ezpass-ny-toll.example/pay)"
               autocomplete="off"
               spellcheck="false"
             />
@@ -88,7 +146,10 @@
           </form>
 
           <div class="sample-row">
-            <span class="sample-label">Test illustrative RFC 2606 patterns:</span>
+            <span class="sample-label">Try real &amp; illustrative patterns:</span>
+            <button type="button" class="chip" data-sample="uspsofficialdelivery[.]com">
+              Fake USPS Text (Case #01)
+            </button>
             <button type="button" class="chip" data-sample="https://ezpass-ny-toll.example/pay-now">
               Unpaid Toll SMS
             </button>
@@ -98,8 +159,8 @@
             <button type="button" class="chip" data-sample="https://bit.ly/example-parcel">
               Shortened Parcel Link
             </button>
-            <button type="button" class="chip" data-sample="https://accounts.google.com/signin">
-              Legit Domain
+            <button type="button" class="chip" data-sample="https://usps.com/">
+              Real USPS.com
             </button>
           </div>
 
@@ -118,7 +179,7 @@
             <div class="section-kicker">INTERACTIVE DEFENSE SHEET</div>
             <h2>60-Second Family &amp; Phone Lockdown Checklist</h2>
             <p class="section-sub">
-              Check off each safeguard below (saved locally on your device) or print a clean copy for your parents.
+              Check off each safeguard below (saved locally on your device) or print/share a clean copy with your parents.
             </p>
           </div>
           <div class="progress-bar-wrap">
@@ -127,7 +188,10 @@
             </div>
             <span id="checklist-progress-pct" class="progress-pct">0%</span>
             <button type="button" id="print-checklist" class="btn btn-secondary no-print" style="padding: 8px 14px; font-size: 13px;">
-              Print / Save PDF
+              Print / PDF
+            </button>
+            <button type="button" id="share-checklist" class="btn btn-secondary no-print" style="padding: 8px 14px; font-size: 13px;">
+              Share
             </button>
           </div>
         </div>
@@ -150,14 +214,14 @@
             <div class="section-kicker">VERIFIED TEARDOWN ARCHIVE</div>
             <h2>Recent BaitCheck Case Files</h2>
             <p class="section-sub">
-              Written red-flag notes and defense protocols from our consumer scam breakdowns.
+              Written red-flag notes, interactive quizzes, and defense protocols from our real consumer scam breakdowns.
             </p>
           </div>
         </div>
         <div id="case-files-grid" class="cards-grid"></div>
       </section>
 
-      <!-- Honest Independent Defenses (Zero fake partner claims!) -->
+      <!-- Honest Independent Defenses -->
       <section id="tools" class="section">
         <div class="section-header">
           <div>
@@ -177,6 +241,12 @@
     <footer class="footer container">
       <p>
         BaitCheck — Independent consumer scam-awareness &amp; artifact teardowns. Educational information only; not legal or financial advice.
+      </p>
+      <p style="margin-top: 8px;">
+        <a href="./privacy.html" class="footer-link">Privacy Policy</a> ·
+        <a href="#inspector" class="footer-link">URL Inspector</a> ·
+        <a href="#checklist" class="footer-link">Family Checklist</a> ·
+        <a href="#cases" class="footer-link">Case Files</a>
       </p>
     </footer>
 

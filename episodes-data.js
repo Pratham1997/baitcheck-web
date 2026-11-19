@@ -5,10 +5,10 @@ window.BAITCHECK_EPISODES = [
     "title": "Spot the 1-Day-Old Fake USPS Text",
     "category": "CONSUMER SCAMS",
     "caseUrl": "./cases/ep01-usps-fake-delivery-teardown.html",
-    "summary": "One of these holiday package texts is a live scam site caught today. Can you spot the trap in three seconds?",
+    "summary": "Live holiday-delivery phishing domain flagged on OpenPhish (Nov 19, 2026)—built to harvest card numbers under a fake $3 fee.",
     "defenseBullets": [
       "Never tap payment links inside unexpected package texts",
-      "Forward spam SMS to 7726 (SPAM) to report carriers",
+      "Forward spam SMS to 7726 (SPAM) to report to carriers",
       "Type usps.com manually or open the official carrier app"
     ]
   }
