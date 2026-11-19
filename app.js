@@ -9,6 +9,9 @@
   const SHORTENERS = new Set([
     'bit.ly', 'tinyurl.com', 't.co', 'rb.gy', 'cutt.ly', 'is.gd', 'ow.ly', 'shorturl.at', 'tiny.cc', 'rebrand.ly',
   ]);
+  const FREE_HOSTING_DOMAINS = new Set([
+    'netlify.app', 'vercel.app', 'blogspot.com', 'pages.dev', 'web.app', 'firebaseapp.com', 'github.io', 'weebly.com', 'wixsite.com',
+  ]);
   const RISKY_TLDS = new Set([
     'xyz', 'top', 'click', 'loan', 'gq', 'tk', 'ml', 'cf', 'work', 'buzz', 'vip', 'shop', 'icu', 'info', 'cfd', 'sbs',
   ]);
@@ -118,6 +121,10 @@
     if (SHORTENERS.has(rootDomain)) {
       score += 35;
       flags.push(`URL shortener (${rootDomain}) hides the true destination — never enter credentials or card info after clicking.`);
+    }
+    if (FREE_HOSTING_DOMAINS.has(rootDomain) && subdomain !== '(none)') {
+      score += 25;
+      flags.push(`Free web hosting subdomain on "${rootDomain}" — legitimate banks, Google, Apple, and carriers never host login or security alerts here.`);
     }
     if (RISKY_TLDS.has(tld)) {
       score += 25;

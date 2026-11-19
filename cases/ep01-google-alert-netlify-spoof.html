@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stop Before Tapping This Fake Google Alert (CASE #01) | BaitCheck</title>
+    <meta name="description" content="Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="canonical" href="https://pratham1997.github.io/baitcheck-web/cases/ep01-google-alert-netlify-spoof.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BaitCheck" />
+    <meta property="og:title" content="Stop Before Tapping This Fake Google Alert (CASE #01) | BaitCheck" />
+    <meta property="og:description" content="Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins." />
+    <meta property="og:url" content="https://pratham1997.github.io/baitcheck-web/cases/ep01-google-alert-netlify-spoof.html" />
+    <meta property="og:image" content="https://pratham1997.github.io/baitcheck-web/og-card.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Stop Before Tapping This Fake Google Alert | BaitCheck" />
+    <meta name="twitter:description" content="Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins." />
+    <meta name="twitter:image" content="https://pratham1997.github.io/baitcheck-web/og-card.png" />
+    <link rel="stylesheet" href="../styles.css" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Stop Before Tapping This Fake Google Alert — How It Works & How to Stop It","description":"Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins.","image":"https://pratham1997.github.io/baitcheck-web/og-card.png","author":{"@type":"Organization","name":"BaitCheck"},"publisher":{"@type":"Organization","name":"BaitCheck"},"mainEntityOfPage":"https://pratham1997.github.io/baitcheck-web/cases/ep01-google-alert-netlify-spoof.html"}</script>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="container nav-inner">
+        <a href="../index.html" class="brand">
+          <span class="rec-dot"></span>
+          <span>BAITCHECK</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="../index.html#inspector">URL Inspector</a>
+          <a href="../index.html#checklist">60s Checklist</a>
+          <a href="../index.html#cases">All Case Files</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding-top: 42px; padding-bottom: 48px;">
+      <a href="../index.html#cases" style="color: #38bdf8; text-decoration: none; font-weight: 700; font-size: 14px;">
+        ← Back to all BaitCheck Case Files
+      </a>
+
+      <div style="margin-top: 20px;">
+        <div class="pill">CASE #01 • CONSUMER SCAMS</div>
+        <h1 style="font-size: clamp(28px, 4vw, 44px); font-weight: 900; line-height: 1.12; margin-bottom: 14px;">
+          Stop Before Tapping This Fake Google Alert
+        </h1>
+        <p style="color: #94a3b8; font-size: 18px; max-width: 760px;">
+          Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins.
+        </p>
+        <p style="color:#64748b;font-size:13px;margin-top:10px;">Artifact / Source: OpenPhish Active Threat Feed (2026-11-19): googlesupportt.netlify[.]app impersonating Google Account Support on free Netlify hosting. Official Google sign-in lives strictly on google.com.</p>
+        <div style="margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="../index.html?url=googlesupportt.netlify%5B.%5Dapp#inspector" class="btn btn-primary">Inspect This Scam URL →</a>
+          <button type="button" id="share-case-btn" class="btn btn-secondary">Share Warning With Family</button>
+        </div>
+        <div id="share-case-msg" class="newsletter-msg"></div>
+      </div>
+
+      
+
+      <section class="section">
+        <div class="section-kicker">VERIFIED ARTIFACT TEARDOWN</div>
+        <h2 style="margin-bottom: 14px;">Live Global Phishing URL Breakdown</h2>
+        <div class="panel">
+          <div style="color:#ff7c92;font-family:ui-monospace,monospace;font-weight:800;font-size:18px;margin-bottom:14px;word-break:break-all;">
+            googlesupportt.netlify[.]app <span style="color:#64748b;font-size:13px;font-weight:600;">(OpenPhish Live Feed • 2026-11-19)</span>
+          </div>
+          <div class="domain-grid">
+            <div class="domain-box"><small>Sneaky Decoy Left</small><code>googlesupportt (2 't's)</code></div><div class="domain-box"><small>True Site Owner</small><code>netlify[.]app (Free Host)</code></div><div class="domain-box"><small>Real Google Sign-In</small><code>accounts.google.com</code></div>
+          </div>
+          <div style="margin-top: 16px;">
+            <a href="../index.html?url=googlesupportt.netlify%5B.%5Dapp#inspector" class="btn btn-secondary" style="font-size: 14px; padding: 10px 16px;">
+              Run googlesupportt.netlify[.]app in BaitCheck URL Inspector →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">SPOTTING THE TRAP</div>
+        <h2 style="margin-bottom: 16px;">Key Red Flags Exposed</h2>
+        <div class="cards-grid">
+          <div class="panel" style="border-color: rgba(255,59,92,0.5);">
+            <div style="color:#ff7c92; font-weight:900; font-size:13px; letter-spacing:0.09em;">RED FLAG • SUBDOMAIN SPOOF TRAP</div>
+            <p style="color:#f1f5f9; margin-top:8px; font-size:15px;">Live phishing page flagged on OpenPhish (Nov 19, 2026)—abuses free Netlify hosting to imitate Google Support and steal logins.</p>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <section class="section">
+        <div class="panel" style="border-color: rgba(16,185,129,0.5); background: rgba(10, 26, 22, 0.85);">
+          <div class="section-kicker" style="color:#6ee7b7;">DEFENSE PROTOCOL</div>
+          <h2 style="margin-bottom: 16px;">THE 1-SECOND LINK RULE</h2>
+          <ul class="flags-list">
+            <li>✅ Read the domain right-to-left before the first '/' — ignore the left decoy</li><li>✅ Turn on a Passkey or Password Manager (won't auto-fill on fake sites)</li>
+          </ul>
+          <div style="margin-top: 22px; display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="../index.html#checklist" class="btn btn-primary">Open 60-Second Family Checklist →</a>
+            <a href="../index.html?url=googlesupportt.netlify%5B.%5Dapp#inspector" class="btn btn-secondary">Inspect a Suspicious URL</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer container">
+      <p>BaitCheck — Independent consumer scam-awareness &amp; artifact teardowns. Educational information only.</p>
+      <p style="margin-top: 8px;">
+        <a href="../privacy.html" class="footer-link">Privacy Policy</a> ·
+        <a href="../index.html#inspector" class="footer-link">URL Inspector</a> ·
+        <a href="../index.html#checklist" class="footer-link">60s Checklist</a>
+      </p>
+    </footer>
+
+    <script>
+      (function () {
+        var quizEl = document.getElementById('case-quiz');
+        var fbEl = document.getElementById('case-quiz-feedback');
+        if (quizEl && fbEl) {
+          var scamOpt = quizEl.getAttribute('data-scam');
+          var detail = "";
+          quizEl.querySelectorAll('.quiz-option-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var picked = btn.getAttribute('data-choice');
+              quizEl.querySelectorAll('.quiz-option-btn').forEach(function (b) {
+                var ch = b.getAttribute('data-choice');
+                b.classList.remove('quiz-scam', 'quiz-legit');
+                b.classList.add(ch === scamOpt ? 'quiz-scam' : 'quiz-legit');
+              });
+              fbEl.classList.add('visible');
+              var right = picked === scamOpt;
+              fbEl.innerHTML =
+                '<div style="font-weight:900;color:' + (right ? '#6ee7b7' : '#ff7c92') + ';margin-bottom:6px;">' +
+                (right ? '✅ Nailed it! Option ' + scamOpt + ' is the live scam bait.' : '⚠️ Watch out! Option ' + scamOpt + ' is the scam bait.') +
+                '</div><div style="color:#e2e8f0;font-size:14px;">' + detail + '</div>';
+            });
+          });
+        }
+        var shareBtn = document.getElementById('share-case-btn');
+        var shareMsg = document.getElementById('share-case-msg');
+        if (shareBtn) {
+          shareBtn.addEventListener('click', async function () {
+            var shareData = {
+              title: document.title,
+              text: 'Heads up — watch out for this active scam teardown from BaitCheck:',
+              url: window.location.href
+            };
+            if (navigator.share) {
+              try { await navigator.share(shareData); return; } catch (e) {}
+            }
+            try {
+              await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url);
+              if (shareMsg) shareMsg.textContent = 'Link copied! Paste into your family WhatsApp or text group.';
+            } catch (e) {
+              window.open('https://wa.me/?text=' + encodeURIComponent(shareData.text + ' ' + shareData.url), '_blank', 'noopener');
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
