@@ -9,7 +9,7 @@ window.LEDGERZERO_CONFIG = {
   brandName: 'LedgerZero',
   tagline: 'True Billion-Dollar Heists, Mind-Bending Money Scale & Interactive Financial Tools',
   social: {
-    youtube: 'https://www.youtube.com/@LedgerZero',
+    youtube: 'https://www.youtube.com/@TheLedgerZero',
     instagram: '',
   },
   // Paste your Beehiiv / ConvertKit / Formspree POST endpoint to activate live email capture
