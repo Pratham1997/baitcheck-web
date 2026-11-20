@@ -1,11 +1,386 @@
 (function () {
-  const cfg = window.BAITCHECK_CONFIG || { resources: [] };
+  const cfg = window.LEDGERZERO_CONFIG || window.BAITCHECK_CONFIG || { resources: [] };
   const episodes = window.BAITCHECK_EPISODES || [];
 
   const brandEl = document.getElementById('brand-name');
   if (brandEl && cfg.brandName) brandEl.textContent = cfg.brandName.toUpperCase();
 
-  // 1. Client-side Phishing URL Inspector (with Official-Domain Allowlist + Bait-Word Detection)
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // =========================================================================
+  // 1. Interactive $100 Bill Stack Calculator (Official US BEP Note Specs)
+  // =========================================================================
+  const BILL_THICKNESS_M = 0.00010922; // 0.0043 in = 0.10922 mm
+  const BILL_WEIGHT_G = 1.0; // 1 gram per Federal Reserve note
+
+  function parseUsdAmount(raw) {
+    const clean = String(raw || '')
+      .trim()
+      .replace(/[$,_\s]/g, '')
+      .toUpperCase();
+    if (!clean) return null;
+    const match = clean.match(/^(\d+(?:\.\d+)?)(K|M|B|T)?$/);
+    if (!match) return null;
+    const num = parseFloat(match[1]);
+    const mult =
+      match[2] === 'K'
+        ? 1e3
+        : match[2] === 'M'
+          ? 1e6
+          : match[2] === 'B'
+            ? 1e9
+            : match[2] === 'T'
+              ? 1e12
+              : 1;
+    const val = num * mult;
+    return Number.isFinite(val) && val > 0 ? val : null;
+  }
+
+  function formatUsdShort(val) {
+    if (val >= 1e12) return `$${(val / 1e12).toFixed(val % 1e12 === 0 ? 0 : 2)}T`;
+    if (val >= 1e9) return `$${(val / 1e9).toFixed(val % 1e9 === 0 ? 0 : 2)}B`;
+    if (val >= 1e6) return `$${(val / 1e6).toFixed(val % 1e6 === 0 ? 0 : 2)}M`;
+    if (val >= 1e3) return `$${(val / 1e3).toFixed(val % 1e3 === 0 ? 0 : 1)}K`;
+    return `$${Math.round(val).toLocaleString('en-US')}`;
+  }
+
+  function calculateMoneyStack(usd) {
+    const bills = usd / 100;
+    const heightM = bills * BILL_THICKNESS_M;
+    const weightKg = (bills * BILL_WEIGHT_G) / 1000;
+
+    let heightDisplay;
+    let heightSub;
+    if (heightM < 1) {
+      heightDisplay = `${(heightM * 100).toFixed(1)} cm`;
+      heightSub = `${(heightM * 1000).toFixed(1)} millimeters`;
+    } else if (heightM < 1000) {
+      heightDisplay = `${heightM.toFixed(heightM < 10 ? 2 : 1)} m`;
+      heightSub = `${(heightM * 3.28084).toFixed(1)} feet tall`;
+    } else {
+      const km = heightM / 1000;
+      heightDisplay = `${km >= 100 ? Math.round(km).toLocaleString('en-US') : km.toFixed(2)} km`;
+      heightSub = `${Math.round(heightM).toLocaleString('en-US')} meters (${(km * 0.621371).toFixed(km >= 100 ? 0 : 1)} miles)`;
+    }
+
+    let landmark;
+    let landmarkSub;
+    let tier;
+    if (heightM < 1.8) {
+      landmark = `${(heightM / 1.0922).toFixed(2)}× Waist-High`;
+      landmarkSub = 'Fits right inside a single bank vault corner';
+      tier = 'GROUND LEVEL';
+    } else if (heightM < 330) {
+      landmark = `${(heightM / 3.3).toFixed(0)}-Story Building`;
+      landmarkSub = `${((heightM / 330) * 100).toFixed(0)}% the height of the Eiffel Tower`;
+      tier = 'SKYSCRAPER SCALE';
+    } else if (heightM < 828) {
+      landmark = `${(heightM / 330).toFixed(2)}× Eiffel Tower`;
+      landmarkSub = `Higher than Paris's Eiffel Tower (330m)`;
+      tier = 'PAST EIFFEL TOWER';
+    } else if (heightM < 8849) {
+      landmark = `${(heightM / 828).toFixed(2)}× Burj Khalifa`;
+      landmarkSub = `Towers past the world's tallest skyscraper (828m)`;
+      tier = 'PAST BURJ KHALIFA';
+    } else if (heightM < 100000) {
+      landmark = `${(heightM / 8849).toFixed(2)}× Mt. Everest`;
+      landmarkSub = `Pierces past Mount Everest (8.8km) & commercial jets (11km)`;
+      tier = 'STRATOSPHERE BREACH';
+    } else if (heightM < 384400000) {
+      const issX = heightM / 408000;
+      if (heightM < 408000) {
+        landmark = `${((heightM / 100000)).toFixed(1)}× Edge of Space`;
+        landmarkSub = `Past the Kármán Line (100 km) into outer space`;
+        tier = 'OUTER SPACE';
+      } else {
+        landmark = `${issX >= 10 ? Math.round(issX).toLocaleString('en-US') : issX.toFixed(1)}× Space Station`;
+        landmarkSub = `Reaches ${((heightM / 384400000) * 100).toFixed(heightM > 3844000 ? 1 : 3)}% of the way to the Moon!`;
+        tier = 'DEEP SPACE ORBIT';
+      }
+    } else {
+      landmark = `${(heightM / 384400000).toFixed(2)}× to the Moon`;
+      landmarkSub = `Reaches past the Moon (384,400 km) in solid $100 bills!`;
+      tier = 'LUNAR SCALE';
+    }
+
+    let weightDisplay;
+    if (weightKg < 1000) {
+      weightDisplay = `${weightKg < 10 ? weightKg.toFixed(2) : Math.round(weightKg).toLocaleString('en-US')} kg`;
+    } else {
+      const tons = weightKg / 1000;
+      weightDisplay = `${tons >= 100 ? Math.round(tons).toLocaleString('en-US') : tons.toFixed(1)} metric tons`;
+    }
+
+    // Log scale bar fill between 0.05m (log10=-1.3) and Moon 3.84e8m (log10=8.58)
+    const logVal = Math.log10(Math.max(0.05, heightM));
+    const pct = Math.max(4, Math.min(100, ((logVal - -1.3) / (8.58 - -1.3)) * 100));
+
+    return {
+      usd,
+      usdShort: formatUsdShort(usd),
+      bills: Math.round(bills),
+      heightM,
+      heightDisplay,
+      heightSub,
+      landmark,
+      landmarkSub,
+      weightDisplay,
+      tier,
+      pct,
+    };
+  }
+
+  window.LEDGERZERO_CALC_STACK = calculateMoneyStack;
+
+  const calcForm = document.getElementById('calc-form');
+  const calcInput = document.getElementById('calc-input');
+  let lastCalc = null;
+
+  function renderStackCalc(raw) {
+    const usd = parseUsdAmount(raw);
+    if (!usd) return;
+    const res = calculateMoneyStack(usd);
+    lastCalc = res;
+
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    set('calc-height', res.heightDisplay);
+    set('calc-height-sub', res.heightSub);
+    set('calc-landmark', res.landmark);
+    set('calc-landmark-sub', res.landmarkSub);
+    set('calc-weight', res.weightDisplay);
+    set('calc-weight-sub', `${res.bills.toLocaleString('en-US')} crisp $100 bills`);
+    set('calc-tier-pill', res.tier);
+    const bar = document.getElementById('calc-bar-fill');
+    if (bar) bar.style.width = `${res.pct.toFixed(1)}%`;
+  }
+
+  if (calcForm && calcInput) {
+    calcForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      renderStackCalc(calcInput.value);
+    });
+    document.querySelectorAll('.calc-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const amt = btn.getAttribute('data-amount') || '1000000000';
+        calcInput.value = amt;
+        renderStackCalc(amt);
+      });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const qAmt = params.get('amount');
+    if (qAmt && parseUsdAmount(qAmt)) {
+      calcInput.value = qAmt;
+      renderStackCalc(qAmt);
+    } else {
+      renderStackCalc(calcInput.value);
+    }
+  }
+
+  const shareCalcBtn = document.getElementById('share-calc-btn');
+  const shareCalcMsg = document.getElementById('share-calc-msg');
+  if (shareCalcBtn) {
+    shareCalcBtn.addEventListener('click', async () => {
+      if (!lastCalc) return;
+      const shareUrl = `${window.location.origin}${window.location.pathname}?amount=${encodeURIComponent(lastCalc.usd)}#calculator`;
+      const text = `${lastCalc.usdShort} stacked in $100 bills is ${lastCalc.heightDisplay} tall (${lastCalc.landmark})! Test your own number on LedgerZero:`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'LedgerZero Money Stack Calculator', text, url: shareUrl });
+          return;
+        } catch {}
+      }
+      try {
+        await navigator.clipboard.writeText(`${text} ${shareUrl}`);
+        if (shareCalcMsg) shareCalcMsg.textContent = 'Copied share link with your exact stack calculation!';
+      } catch {
+        if (shareCalcMsg) shareCalcMsg.textContent = `${text} ${shareUrl}`;
+      }
+    });
+  }
+
+  // =========================================================================
+  // 2. Playable 5-Second "$850M Typo Challenge" Mini-Game
+  // =========================================================================
+  const GAME_ROUNDS = [
+    {
+      badge: 'ROUND 1 / 3 • FEB 2016 BANGLADESH BANK',
+      route: 'NY FED → DEUTSCHE BANK → SRI LANKA',
+      amount: '$20,000,000',
+      text: 'SHALIKA FANDATION • COLOMBO',
+      meta: 'Note: 4 prior wires ($81M) cleared 12 minutes ago. Confirmation printer is offline.',
+      shouldFreeze: true,
+      explain:
+        'REAL HEIST CATCH! Hackers misspelled "FOUNDATION" as "FANDATION". One Deutsche Bank analyst caught that single "A" and froze $850M+ in pending transfers.',
+    },
+    {
+      badge: 'ROUND 2 / 3 • REAL 2013–2015 TECH INVOICE HEIST',
+      route: 'GOOGLE / FACEBOOK AP → QUANTA COMPUTER INC',
+      amount: '$23,000,000',
+      text: 'BENEFICIARY BANK: LITHUANIA (LT89) • SUPPLIER HQ: TAIWAN',
+      meta: 'Invoice matches real hardware supplier name, but bank country silently switched to Lithuania.',
+      shouldFreeze: true,
+      explain:
+        'REAL $121M SCAM! Evaldas Rimasauskas registered a fake "Quanta Computer" in Latvia/Lithuania and sent lookalike invoices to Google and Facebook—collecting $121M before getting caught.',
+    },
+    {
+      badge: 'ROUND 3 / 3 • ROUTINE TREASURY SETTLEMENT',
+      route: 'TREASURY DESK → FEDERAL RESERVE BANK OF NY',
+      amount: '$15,000,000',
+      text: 'SHALIKA FOUNDATION • VERIFIED BIC: DEUTDEFF',
+      meta: 'Dual-signed SWIFT key, exact verified beneficiary spelling, and matching callback log.',
+      shouldFreeze: false,
+      explain:
+        'CLEAN WIRE! Exact spelling ("FOUNDATION"), verified BIC routing, and valid dual-signature confirmation. Good analysts avoid false alarms too!',
+    },
+  ];
+
+  let roundIdx = 0;
+  let score = 0;
+  let roundLocked = false;
+  let timerId = null;
+  let timeLeftMs = 5000;
+
+  const gBadge = document.getElementById('game-round-label');
+  const gTimer = document.getElementById('game-timer');
+  const gRoute = document.getElementById('game-wire-route');
+  const gAmt = document.getElementById('game-wire-amount');
+  const gText = document.getElementById('game-wire-text');
+  const gMeta = document.getElementById('game-wire-meta');
+  const gFb = document.getElementById('game-feedback');
+  const gNext = document.getElementById('game-next-btn');
+  const gRestart = document.getElementById('game-restart-btn');
+  const gShare = document.getElementById('game-share-btn');
+  const gShareMsg = document.getElementById('game-share-msg');
+  const gFreezeBtn = document.getElementById('game-btn-freeze');
+  const gApproveBtn = document.getElementById('game-btn-approve');
+
+  function stopTimer() {
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function loadRound(idx) {
+    stopTimer();
+    roundIdx = idx;
+    roundLocked = false;
+    timeLeftMs = 5000;
+    const r = GAME_ROUNDS[idx];
+    if (!r || !gBadge) return;
+
+    gBadge.textContent = r.badge;
+    gRoute.textContent = r.route;
+    gAmt.textContent = r.amount;
+    gText.textContent = r.text;
+    gMeta.textContent = r.meta;
+    gTimer.textContent = '5.0s';
+    gTimer.style.color = '#facc15';
+    gFb.classList.remove('visible');
+    gFb.innerHTML = '';
+    gNext.style.display = 'none';
+    gRestart.style.display = 'none';
+    gShare.style.display = 'none';
+    if (gShareMsg) gShareMsg.textContent = '';
+
+    // Start countdown once user interacts or scrolls to game; run softly on rounds 2+
+    if (idx > 0) startCountdown();
+  }
+
+  function startCountdown() {
+    stopTimer();
+    timerId = setInterval(() => {
+      timeLeftMs = Math.max(0, timeLeftMs - 100);
+      if (gTimer) {
+        gTimer.textContent = `${(timeLeftMs / 1000).toFixed(1)}s`;
+        if (timeLeftMs <= 1800) gTimer.style.color = '#ff3b5c';
+      }
+      if (timeLeftMs <= 0) {
+        resolveRound(null);
+      }
+    }, 100);
+  }
+
+  function resolveRound(choseFreeze) {
+    if (roundLocked) return;
+    roundLocked = true;
+    stopTimer();
+    const r = GAME_ROUNDS[roundIdx];
+    const timedOut = choseFreeze === null;
+    const correct = !timedOut && choseFreeze === r.shouldFreeze;
+    if (correct) score++;
+
+    const isLast = roundIdx === GAME_ROUNDS.length - 1;
+    gFb.classList.add('visible');
+    gFb.innerHTML = `
+      <div style="font-weight:900;font-size:16px;color:${correct ? '#6ee7b7' : '#ff7c92'};margin-bottom:8px;">
+        ${
+          timedOut
+            ? '⏱️ TIME UP — Wire slipped through!'
+            : correct
+              ? '✅ SHARP EYE! Correct call.'
+              : '❌ MISSED IT! That call cost the bank.'
+        }
+      </div>
+      <div style="color:#e2e8f0;font-size:14px;line-height:1.5;">${escapeHtml(r.explain)}</div>
+      ${
+        isLast
+          ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(148,163,184,0.2);font-weight:900;color:#facc15;">
+              FINAL COMPLIANCE SCORE: ${score} / ${GAME_ROUNDS.length} ${score === 3 ? '— YOU SAVED $850M+!' : score === 2 ? '— SOLID ANALYST!' : '— HACKERS DRAINED THE VAULT!'}
+            </div>`
+          : ''
+      }
+    `;
+
+    if (!isLast) {
+      gNext.style.display = 'inline-flex';
+    } else {
+      gRestart.style.display = 'inline-flex';
+      gShare.style.display = 'inline-flex';
+    }
+  }
+
+  if (gFreezeBtn && gApproveBtn) {
+    gFreezeBtn.addEventListener('click', () => resolveRound(true));
+    gApproveBtn.addEventListener('click', () => resolveRound(false));
+    gNext.addEventListener('click', () => loadRound(roundIdx + 1));
+    gRestart.addEventListener('click', () => {
+      score = 0;
+      loadRound(0);
+      startCountdown();
+    });
+    gShare.addEventListener('click', async () => {
+      const url = `${window.location.origin}${window.location.pathname}#typo-game`;
+      const text = `I scored ${score}/${GAME_ROUNDS.length} on the LedgerZero 5-Second $850M Bank Heist Typo Challenge! Think you'd spot the typo in time?`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'LedgerZero $850M Typo Challenge', text, url });
+          return;
+        } catch {}
+      }
+      try {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        if (gShareMsg) gShareMsg.textContent = 'Score copied! Paste it into your group chat.';
+      } catch {
+        if (gShareMsg) gShareMsg.textContent = `${text} ${url}`;
+      }
+    });
+    loadRound(0);
+  }
+
+  // =========================================================================
+  // 3. Bonus Client-Side Phishing URL Inspector (Preserved 100%)
+  // =========================================================================
   const SHORTENERS = new Set([
     'bit.ly', 'tinyurl.com', 't.co', 'rb.gy', 'cutt.ly', 'is.gd', 'ow.ly', 'shorturl.at', 'tiny.cc', 'rebrand.ly',
   ]);
@@ -31,13 +406,7 @@
     bankofamerica: ['bankofamerica.com'],
     wellsfargo: ['wellsfargo.com'],
     coinbase: ['coinbase.com'],
-    ezpass: [
-      'ezpassny.com', 'e-zpassny.com', 'ezpassnj.com', 'ezpasspa.com', 'ezpassva.com',
-      'ezpassma.com', 'ezpassmd.com', 'ezpassde.com', 'ezpassil.com', 'ezpassnh.com',
-      'ezpassoh.com', 'ezpasswv.com', 'ezpassin.com', 'ezpassri.com', 'ezpassme.com', 'e-zpassiag.com',
-    ],
-    sunpass: ['sunpass.com'],
-    fastrak: ['bayareafastrak.org', 'thetollroads.com', 'metroexpresslanes.net'],
+    ezpass: ['ezpassny.com', 'e-zpassny.com', 'ezpassnj.com', 'ezpasspa.com', 'ezpassva.com'],
     irs: ['irs.gov'],
     sbi: ['sbi.co.in', 'onlinesbi.sbi'],
     hdfc: ['hdfcbank.com'],
@@ -57,27 +426,21 @@
     const parts = host.toLowerCase().split('.').filter(Boolean);
     if (parts.length <= 2) return host.toLowerCase();
     const last2 = parts.slice(-2).join('.');
-    if (TWO_PART_TLDS.has(last2) && parts.length >= 3) {
-      return parts.slice(-3).join('.');
-    }
+    if (TWO_PART_TLDS.has(last2) && parts.length >= 3) return parts.slice(-3).join('.');
     return last2;
   }
 
   function getRootLabel(rootDomain) {
     const parts = rootDomain.split('.');
-    if (parts.length >= 3 && TWO_PART_TLDS.has(parts.slice(-2).join('.'))) {
-      return parts.slice(0, -2).join('.');
-    }
+    if (parts.length >= 3 && TWO_PART_TLDS.has(parts.slice(-2).join('.'))) return parts.slice(0, -2).join('.');
     return parts.slice(0, -1).join('.');
   }
 
   function matchesBrandInLabel(label, brand) {
     if (!label.includes(brand)) return false;
-    // Avoid false positives for short <=3-char brands inside normal words (e.g. "ups" in "groups", "irs" in "first")
     if (brand.length <= 3) {
       const boundaryRe = new RegExp(`(^|[-_0-9])${brand}($|[-_0-9])`);
       if (boundaryRe.test(label)) return true;
-      // Also match short brand prefix glued directly to a known scam bait word (e.g. "upsdelivery", "irspay")
       return BAIT_DOMAIN_WORDS.some((w) => label.includes(`${brand}${w}`) || label.includes(`${w}${brand}`));
     }
     return true;
@@ -116,117 +479,67 @@
     }
     if (host.includes('xn--')) {
       score += 50;
-      flags.push('Punycode / internationalized lookalike characters detected (homograph attack risk).');
+      flags.push('Punycode / internationalized lookalike characters detected.');
     }
     if (SHORTENERS.has(rootDomain)) {
       score += 35;
-      flags.push(`URL shortener (${rootDomain}) hides the true destination — never enter credentials or card info after clicking.`);
+      flags.push(`URL shortener (${rootDomain}) hides the true destination.`);
     }
     if (FREE_HOSTING_DOMAINS.has(rootDomain) && subdomain !== '(none)') {
       score += 25;
-      flags.push(`Free web hosting subdomain on "${rootDomain}" — legitimate banks, Google, Apple, and carriers never host login or security alerts here.`);
+      flags.push(`Free hosting subdomain on "${rootDomain}" — banks and big tech never host login alerts here.`);
     }
     if (RISKY_TLDS.has(tld)) {
       score += 25;
-      flags.push(`High-abuse top-level domain (.${tld}) frequently used in disposable scam campaigns.`);
+      flags.push(`High-abuse top-level domain (.${tld}) frequently used in throwaway campaigns.`);
     }
     if (raw.includes('@')) {
       score += 45;
-      flags.push('Contains "@" symbol — attackers use this to disguise the real host after the @.');
+      flags.push('Contains "@" symbol used to mask the real host.');
     }
     if ((rootLabel.match(/-/g) || []).length >= 2) {
       score += 25;
-      flags.push(`Multi-hyphen root domain ("${rootDomain}") — heavily used in disposable phishing clones.`);
-    } else if ((rootLabel.match(/-/g) || []).length >= 1 && /\d/.test(rootLabel)) {
-      score += 25;
-      flags.push(`Root domain "${rootDomain}" mixes hyphens and digits — common in throwaway scam clones.`);
+      flags.push(`Multi-hyphen root domain ("${rootDomain}") — heavily used in phishing clones.`);
     }
 
-    // Brand impersonation check (works WITH OR WITHOUT hyphens, e.g. uspsofficialdelivery.com!)
     let brandImpersonated = null;
     for (const [brand, officialList] of Object.entries(BRAND_OFFICIAL_DOMAINS)) {
-      const isOfficial = officialList.includes(rootDomain);
-      if (isOfficial) continue;
-
+      if (officialList.includes(rootDomain)) continue;
       if (subdomain !== '(none)' && matchesBrandInLabel(subdomain, brand)) {
         score += 55;
         brandImpersonated = brand;
-        flags.push(
-          `Subdomain spoofing: mentions "${brand.toUpperCase()}" on the left, but the TRUE site owner is "${rootDomain}" (official: ${officialList[0]}).`,
-        );
+        flags.push(`Subdomain spoofing: mentions "${brand.toUpperCase()}" on the left, but the true owner is "${rootDomain}" (official: ${officialList[0]}).`);
         break;
       }
-
       if (matchesBrandInLabel(rootLabel, brand)) {
         score += 55;
         brandImpersonated = brand;
-        flags.push(
-          `Brand lookalike root domain: "${rootDomain}" embeds "${brand.toUpperCase()}" inside an unofficial domain. Official domain is ${officialList[0]}.`,
-        );
+        flags.push(`Brand lookalike root domain: "${rootDomain}" embeds "${brand.toUpperCase()}" inside an unofficial domain (official: ${officialList[0]}).`);
         break;
       }
     }
 
-    // Check suspicious bait words glued inside the root domain (e.g., "official" + "delivery", "pay" + "zone")
     const isAnyOfficial = Object.values(BRAND_OFFICIAL_DOMAINS).some((list) => list.includes(rootDomain));
     if (!isAnyOfficial) {
       const hitDomainBait = BAIT_DOMAIN_WORDS.filter((w) => rootLabel.includes(w));
       if (hitDomainBait.length >= 2) {
         score += 30;
-        flags.push(
-          `High-pressure bait keywords glued into the domain name (${hitDomainBait.slice(0, 4).join(', ')}) — classic smishing clone pattern.`,
-        );
+        flags.push(`High-pressure bait keywords glued into the domain name (${hitDomainBait.slice(0, 4).join(', ')}).`);
       } else if (hitDomainBait.length === 1 && (brandImpersonated || rootLabel.includes('-'))) {
         score += 20;
-        flags.push(
-          `Suspicious action keyword ("${hitDomainBait[0]}") combined with a lookalike or hyphenated domain.`,
-        );
+        flags.push(`Suspicious keyword ("${hitDomainBait[0]}") combined with a lookalike or hyphenated domain.`);
       }
-    }
-
-    // Check subdomain depth / gov spoof tokens
-    if (subdomain !== '(none)' && /\bgov\b|-gov|gov-/.test(subdomain) && !tld.endsWith('gov')) {
-      score += 45;
-      flags.push(`Government impersonation cue ("gov") in subdomain on a non-.gov domain ("${rootDomain}").`);
-    }
-
-    const suspiciousPathWords = ['verify', 'kyc', 'urgent', 'suspend', 'refund', 'claim', 'unlock', 'pay-now', 'login'];
-    const pathLower = `${parsed.pathname}${parsed.search}`.toLowerCase();
-    const hitPath = suspiciousPathWords.filter((w) => pathLower.includes(w));
-    if (hitPath.length > 0 && score > 0) {
-      score += 10;
-      flags.push(`Urgency/credential path keywords detected (${hitPath.join(', ')}).`);
     }
 
     score = Math.min(100, score);
     const level = score >= 50 ? 'high' : score >= 25 ? 'medium' : 'low';
     if (flags.length === 0) {
-      flags.push(
-        `No obvious structural red flags found. Still confirm "${rootDomain}" is the exact official domain you expect before entering any password or card.`,
-      );
+      flags.push(`No obvious structural red flags found. Still verify "${rootDomain}" directly before entering credentials.`);
     }
-
-    return {
-      host,
-      rootDomain,
-      subdomain,
-      protocol: hasExplicitScheme ? parsed.protocol : '(not specified)',
-      score,
-      level,
-      flags,
-    };
+    return { host, rootDomain, subdomain, protocol: hasExplicitScheme ? parsed.protocol : '(not specified)', score, level, flags };
   }
 
-  // Expose pure analyzer for automated CLI verification if needed
   window.BAITCHECK_ANALYZE_URL = analyzeUrl;
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
 
   const urlForm = document.getElementById('url-form');
   const urlInput = document.getElementById('url-input');
@@ -240,262 +553,97 @@
       urlResult.innerHTML = `<div style="color:#ff7c92;font-weight:700;">${escapeHtml(res.error)}</div>`;
       return;
     }
-
-    const badgeClass =
-      res.level === 'high' ? 'verdict-high' : res.level === 'medium' ? 'verdict-medium' : 'verdict-low';
+    const badgeClass = res.level === 'high' ? 'verdict-high' : res.level === 'medium' ? 'verdict-medium' : 'verdict-low';
     const badgeLabel =
       res.level === 'high'
-        ? `HIGH RISK (${res.score}/100) — LIKELY SCAM BAIT`
+        ? `HIGH RISK (${res.score}/100) — LIKELY SPOOF`
         : res.level === 'medium'
-          ? `SUSPICIOUS (${res.score}/100) — VERIFY INDEPENDENTLY`
+          ? `SUSPICIOUS (${res.score}/100)`
           : `NO STRUCTURAL RED FLAGS (${res.score}/100)`;
 
     urlResult.innerHTML = `
       <div class="verdict-row">
         <span class="verdict-badge ${badgeClass}">${badgeLabel}</span>
-        <span style="color:#94a3b8;font-size:13px;">True destination owner: <strong style="color:#f8fafc;">${escapeHtml(res.rootDomain)}</strong></span>
+        <span style="color:#94a3b8;font-size:13px;">True owner: <strong style="color:#f8fafc;">${escapeHtml(res.rootDomain)}</strong></span>
       </div>
       <div class="domain-grid">
-        <div class="domain-box">
-          <small>True Root Domain</small>
-          <code style="color:${res.level === 'high' ? '#ff7c92' : res.level === 'medium' ? '#fcd34d' : '#6ee7b7'};font-weight:800;">${escapeHtml(res.rootDomain)}</code>
-        </div>
-        <div class="domain-box">
-          <small>Subdomain (Can Be Faked)</small>
-          <code>${escapeHtml(res.subdomain)}</code>
-        </div>
-        <div class="domain-box">
-          <small>Protocol</small>
-          <code>${escapeHtml(res.protocol.replace(':', '').toUpperCase())}</code>
-        </div>
+        <div class="domain-box"><small>True Root Domain</small><code>${escapeHtml(res.rootDomain)}</code></div>
+        <div class="domain-box"><small>Left Subdomain</small><code>${escapeHtml(res.subdomain)}</code></div>
+        <div class="domain-box"><small>Full Host</small><code>${escapeHtml(res.host)}</code></div>
       </div>
-      <ul class="flags-list">
-        ${res.flags.map((f) => `<li>• ${escapeHtml(f)}</li>`).join('')}
-      </ul>
+      <ul class="flags-list">${res.flags.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
     `;
   }
 
-  if (urlForm) {
+  if (urlForm && urlInput) {
     urlForm.addEventListener('submit', (e) => {
       e.preventDefault();
       renderUrlReport(urlInput.value);
     });
-  }
-
-  document.querySelectorAll('.chip[data-sample]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      urlInput.value = btn.getAttribute('data-sample') || '';
-      renderUrlReport(urlInput.value);
-    });
-  });
-
-  // Auto-run inspection if deep-linked via ?url=... (e.g. from a Case File page)
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const prefillUrl = params.get('url');
-    if (prefillUrl && urlInput) {
-      urlInput.value = prefillUrl;
-      renderUrlReport(prefillUrl);
-    }
-  } catch {}
-
-  // 2. Consumer-Focused 60-Second Lockdown Checklist
-  const CHECKLIST_DATA = [
-    {
-      id: 'safe-word',
-      cat: 'family',
-      title: 'Set a private offline Family Safe Word',
-      desc: 'Stops AI voice-clone panic calls instantly—agree on one unusual word in person that no caller can guess.',
-    },
-    {
-      id: 'callback-rule',
-      cat: 'family',
-      title: 'Enforce the "Hang Up & Call Back" rule',
-      desc: 'For any bank, police, or emergency call, hang up and dial the saved contact or official number on the back of your card.',
-    },
-    {
-      id: 'voicemail-voice',
-      cat: 'family',
-      title: 'Switch voicemail back to the default automated greeting',
-      desc: 'Prevents unknown callers from recording a clean 5-second voice sample off your voicemail.',
-    },
-    {
-      id: 'silence-unknown',
-      cat: 'mobile',
-      title: 'Enable "Silence Unknown Callers" on iPhone / Android & WhatsApp',
-      desc: 'Blocks spoofed scam calls and unverified video calls before they trigger panic.',
-    },
-    {
-      id: 'sim-pin',
-      cat: 'mobile',
-      title: 'Turn on carrier Port-Out Lock & switch banking/email off SMS 2FA',
-      desc: 'Stops SIM-swap attackers from hijacking SMS verification codes to reset your accounts.',
-    },
-    {
-      id: 'sms-links',
-      cat: 'mobile',
-      title: 'Never tap payment links in unexpected toll, parcel, or bank texts',
-      desc: 'Forward spam SMS to 7726 (SPAM) and open the official toll, courier, or bank app directly.',
-    },
-    {
-      id: 'qr-check',
-      cat: 'finance',
-      title: 'Inspect public QR signs for pasted stickers & check the root domain',
-      desc: 'Run a finger over parking-meter QR labels and verify the exact domain before entering card details.',
-    },
-    {
-      id: 'credit-freeze',
-      cat: 'finance',
-      title: 'Place free credit freezes & lower daily instant-transfer limits',
-      desc: 'Prevents identity thieves from opening new credit lines and caps damage if an account is compromised.',
-    },
-  ];
-
-  const STORAGE_KEY = 'baitcheck_checklist_v1';
-  let checkedState = {};
-  try {
-    checkedState = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  } catch {
-    checkedState = {};
-  }
-
-  let currentCat = 'all';
-  const checklistEl = document.getElementById('checklist-items');
-  const fillEl = document.getElementById('checklist-progress-fill');
-  const pctEl = document.getElementById('checklist-progress-pct');
-
-  function updateProgress() {
-    const done = CHECKLIST_DATA.filter((item) => checkedState[item.id]).length;
-    const pct = Math.round((done / CHECKLIST_DATA.length) * 100);
-    if (fillEl) fillEl.style.width = `${pct}%`;
-    if (pctEl) pctEl.textContent = `${pct}%`;
-  }
-
-  function renderChecklist() {
-    if (!checklistEl) return;
-    const items =
-      currentCat === 'all'
-        ? CHECKLIST_DATA
-        : CHECKLIST_DATA.filter((i) => i.cat === currentCat);
-
-    checklistEl.innerHTML = items
-      .map((item) => {
-        const isChecked = Boolean(checkedState[item.id]);
-        return `
-          <label class="check-item ${isChecked ? 'checked' : ''}">
-            <input type="checkbox" data-id="${item.id}" ${isChecked ? 'checked' : ''} />
-            <div>
-              <div class="check-title">${escapeHtml(item.title)}</div>
-              <div class="check-desc">${escapeHtml(item.desc)}</div>
-            </div>
-          </label>
-        `;
-      })
-      .join('');
-
-    checklistEl.querySelectorAll('input[type="checkbox"]').forEach((box) => {
-      box.addEventListener('change', (e) => {
-        const id = e.target.getAttribute('data-id');
-        checkedState[id] = e.target.checked;
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedState));
-        } catch {}
-        e.target.closest('.check-item').classList.toggle('checked', e.target.checked);
-        updateProgress();
+    document.querySelectorAll('[data-sample]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const sample = chip.getAttribute('data-sample') || '';
+        urlInput.value = sample;
+        renderUrlReport(sample);
       });
     });
-
-    updateProgress();
-  }
-
-  document.querySelectorAll('#checklist-tabs .tab-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#checklist-tabs .tab-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCat = btn.getAttribute('data-cat') || 'all';
-      renderChecklist();
-    });
-  });
-
-  const printBtn = document.getElementById('print-checklist');
-  if (printBtn) {
-    printBtn.addEventListener('click', () => {
-      currentCat = 'all';
-      renderChecklist();
-      window.print();
-    });
-  }
-
-  renderChecklist();
-
-  // Shared 1-Tap Family Share helper (Web Share API -> Clipboard / WhatsApp fallback)
-  async function shareBaitCheck(title, text, url, feedbackEl) {
-    const shareUrl = url || window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text, url: shareUrl });
-        if (feedbackEl) feedbackEl.textContent = 'Shared! Thanks for protecting your family.';
-        return;
-      } catch {}
-    }
-    try {
-      await navigator.clipboard.writeText(`${text} ${shareUrl}`);
-      if (feedbackEl) feedbackEl.textContent = 'Link copied! Paste straight into your family WhatsApp or text group.';
-    } catch {
-      window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${shareUrl}`)}`, '_blank', 'noopener');
+    const urlParam = new URLSearchParams(window.location.search).get('url');
+    if (urlParam) {
+      urlInput.value = urlParam;
+      renderUrlReport(urlParam);
     }
   }
 
-  const shareHubBtn = document.getElementById('share-hub-btn');
-  const shareHubMsg = document.getElementById('share-hub-msg');
-  if (shareHubBtn) {
-    shareHubBtn.addEventListener('click', () => {
-      shareBaitCheck(
-        'BaitCheck — Free Family Scam Checklist & Private URL Inspector',
-        'Useful free tool to check suspicious package/bank links privately + 60-second Family Scam Checklist:',
-        window.location.href.split('#')[0].split('?')[0],
-        shareHubMsg,
-      );
-    });
+  // =========================================================================
+  // 4. Case Files Archive & Resources Cards + Newsletter State
+  // =========================================================================
+  const caseGrid = document.getElementById('case-files-grid');
+  if (caseGrid) {
+    if (episodes.length === 0) {
+      caseGrid.innerHTML = '<div class="panel" style="color:#94a3b8;">New LedgerZero dossiers publishing soon.</div>';
+    } else {
+      caseGrid.innerHTML = episodes
+        .map(
+          (ep) => `
+        <article class="case-card">
+          <div class="case-meta">
+            <span>${escapeHtml(ep.caseNumber)}</span>
+            <span style="color:#6ee7b7;">${escapeHtml(ep.category)}</span>
+          </div>
+          <h3>${escapeHtml(ep.title)}</h3>
+          <p style="color:#94a3b8;font-size:14px;">${escapeHtml(ep.summary)}</p>
+          <a href="${escapeHtml(ep.caseUrl)}" class="btn btn-secondary" style="margin-top:auto;font-size:13px;padding:10px 14px;">
+            Read Full Dossier →
+          </a>
+        </article>
+      `,
+        )
+        .join('');
+    }
   }
 
-  const shareChecklistBtn = document.getElementById('share-checklist');
-  if (shareChecklistBtn) {
-    shareChecklistBtn.addEventListener('click', () => {
-      const base = window.location.href.split('#')[0].split('?')[0];
-      shareBaitCheck(
-        '60-Second Family Scam Lockdown Checklist — BaitCheck',
-        'Quick 60-second phone & family scam checklist worth saving:',
-        `${base}#checklist`,
-      );
-    });
+  const resGrid = document.getElementById('affiliate-cards');
+  const disclosureBanner = document.getElementById('disclosure-banner');
+  if (disclosureBanner && cfg.affiliatesEnabled) {
+    disclosureBanner.style.display = 'block';
+    disclosureBanner.innerHTML =
+      '<strong>Disclosure:</strong> Some links below may be partner links that earn LedgerZero a commission at no extra cost to you.';
   }
-
-  // 3. Render Honest Independent Resources (only shows affiliate disclosure if affiliatesEnabled === true)
-  const disclosureEl = document.getElementById('disclosure-banner');
-  if (disclosureEl && cfg.affiliatesEnabled) {
-    disclosureEl.style.display = 'block';
-    disclosureEl.innerHTML =
-      '<strong>Affiliate Disclosure:</strong> Some links below are approved partner links. If you sign up through them, BaitCheck may earn a commission at zero extra cost to you.';
-  }
-
-  const resEl = document.getElementById('affiliate-cards');
-  const items = cfg.resources || [];
-  if (resEl && Array.isArray(items)) {
-    resEl.innerHTML = items
+  if (resGrid && Array.isArray(cfg.resources)) {
+    resGrid.innerHTML = cfg.resources
       .map(
-        (tool) => `
-      <article class="tool-card accent-${escapeHtml(tool.accent || 'cyan')}">
+        (r) => `
+      <article class="tool-card accent-${escapeHtml(r.accent || 'emerald')}">
         <div>
-          <span class="tool-badge">${escapeHtml(tool.badge)}</span>
-          <h3>${escapeHtml(tool.name)}</h3>
-          <p>${escapeHtml(tool.summary)}</p>
+          <span class="tool-badge">${escapeHtml(r.badge)}</span>
+          <h3>${escapeHtml(r.name)}</h3>
+          <p>${escapeHtml(r.summary)}</p>
         </div>
         <div>
-          <a class="btn btn-primary" style="width:100%;" href="${escapeHtml(tool.url)}" target="_blank" rel="noopener noreferrer${cfg.affiliatesEnabled ? ' sponsored' : ''}">
-            ${escapeHtml(tool.ctaLabel)} →
+          <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width:100%;">
+            ${escapeHtml(r.ctaLabel)} ↗
           </a>
-          <div class="partner-note">${escapeHtml(tool.note || '')}</div>
+          <div class="partner-note">${escapeHtml(r.note || '')}</div>
         </div>
       </article>
     `,
@@ -503,70 +651,59 @@
       .join('');
   }
 
-  // 4. Render Auto-Synced Published Case Files Archive
-  const casesSection = document.getElementById('cases');
-  const casesEl = document.getElementById('case-files-grid');
-  if (casesEl) {
-    if (episodes.length === 0 && casesSection) {
-      casesSection.style.display = 'none';
+  // Newsletter auto-mode (live POST vs Instant Lab Mode)
+  const liveWrap = document.getElementById('newsletter-live-wrap');
+  const instantWrap = document.getElementById('newsletter-instant-wrap');
+  const secondaryActions = document.getElementById('hero-secondary-actions');
+  if (liveWrap && instantWrap) {
+    if (cfg.newsletterEndpoint) {
+      liveWrap.style.display = 'block';
+      instantWrap.style.display = 'none';
+      const form = document.getElementById('newsletter-form');
+      const msg = document.getElementById('newsletter-msg');
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('newsletter-email')?.value?.trim();
+          if (!email) return;
+          try {
+            const res = await fetch(cfg.newsletterEndpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+            if (msg) msg.textContent = res.ok ? 'Subscribed! Check your inbox.' : 'Could not subscribe right now—try again later.';
+          } catch {
+            if (msg) msg.textContent = 'Network error—please try again later.';
+          }
+        });
+      }
+    } else {
+      liveWrap.style.display = 'none';
+      instantWrap.style.display = 'block';
+      if (secondaryActions) secondaryActions.style.display = 'none';
     }
-    casesEl.innerHTML = episodes
-      .map((ep) => {
-        const bullets = (ep.defenseBullets || [])
-          .slice(0, 3)
-          .map((b) => `<li>✓ ${escapeHtml(b)}</li>`)
-          .join('');
-        return `
-        <article class="case-card">
-          <div class="case-meta">
-            <span>${escapeHtml(ep.caseNumber)}</span>
-            <span style="color:#38bdf8;">${escapeHtml(ep.category)}</span>
-          </div>
-          <h3>${escapeHtml(ep.title)}</h3>
-          <p style="font-size:14px;color:#94a3b8;">${escapeHtml(ep.summary)}</p>
-          <ul class="case-bullets">${bullets}</ul>
-          <a href="${escapeHtml(ep.caseUrl || '#')}" style="margin-top:auto;padding-top:8px;color:#38bdf8;font-weight:700;font-size:13px;text-decoration:none;">
-            Read full forensic guide &amp; take 3s quiz →
-          </a>
-        </article>
-      `;
-      })
-      .join('');
   }
 
-  // 5. Primary Email Capture Form (cleanly switches to instant-kit mode if newsletterEndpoint is not yet connected)
-  const nlLiveWrap = document.getElementById('newsletter-live-wrap');
-  const nlInstantWrap = document.getElementById('newsletter-instant-wrap');
-  const heroSecActions = document.getElementById('hero-secondary-actions');
-  const nlForm = document.getElementById('newsletter-form');
-  const nlEmail = document.getElementById('newsletter-email');
-  const nlMsg = document.getElementById('newsletter-msg');
-
-  if (!cfg.newsletterEndpoint) {
-    if (nlLiveWrap) nlLiveWrap.style.display = 'none';
-    if (nlInstantWrap) nlInstantWrap.style.display = 'block';
-    if (heroSecActions) heroSecActions.style.display = 'none';
-  } else if (nlForm) {
-    nlForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = (nlEmail.value || '').trim();
-      if (!email) return;
-
-      try {
-        nlMsg.style.color = '#6ee7b7';
-        nlMsg.textContent = 'Subscribing...';
-        const res = await fetch(cfg.newsletterEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ email, source: 'baitcheck-hub' }),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        nlMsg.textContent = 'You are in! Watch your inbox for this week’s BaitCheck alert.';
-        nlEmail.value = '';
-      } catch (err) {
-        nlMsg.style.color = '#ff7c92';
-        nlMsg.textContent = `Could not subscribe right now (${err.message}).`;
+  const shareHubBtn = document.getElementById('share-hub-btn');
+  const shareHubMsg = document.getElementById('share-hub-msg');
+  if (shareHubBtn) {
+    shareHubBtn.addEventListener('click', async () => {
+      const shareData = {
+        title: 'LedgerZero — Billion-Dollar Heists & Money Scale',
+        text: 'Try the live $100 Bill Stack Calculator & 5-Second $850M Bank Heist Typo Challenge on LedgerZero:',
+        url: window.location.href,
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch {}
       }
+      try {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        if (shareHubMsg) shareHubMsg.textContent = 'Hub link copied!';
+      } catch {}
     });
   }
 })();
